@@ -1,0 +1,329 @@
+/* 全局样式重置与基础设置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0f7fa 0%, #0288d1 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+    color: #333;
+}
+
+/* 容器样式 - 仅限制内容区域宽度 */
+.container {
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 头部卡片 - 横跨整个页面 */
+.header-card {
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.header-card .card-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    padding: 15px 30px;
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+/* 确保标题在一行显示 */
+.header-card h1 {
+    margin: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* 头部登录注册按钮样式 */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.auth-buttons .btn {
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 6px 15px;
+    white-space: nowrap;
+}
+
+.auth-buttons .btn-light {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #007bff;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.auth-buttons .btn-light:hover {
+    background-color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.auth-buttons .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* 模态框样式优化 */
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 2px solid #f0f0f0;
+    padding: 20px 25px;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    border-top: 2px solid #f0f0f0;
+    padding: 20px 25px;
+}
+
+.modal-footer .btn-secondary {
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    height: 40px;
+    margin-top: 15px;
+}
+
+.modal-footer .btn-primary {
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    height: 40px;
+}
+
+/* 内容卡片样式 */
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* 区域标题样式 */
+.card-body h4 {
+    color: #007bff;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.25rem;
+}
+
+.card-body p {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+/* 表单控件样式 */
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+/* 按钮样式优化 */
+.btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* 状态消息样式 */
+#uploadStatus {
+    margin-top: 15px;
+}
+
+/* 答案显示区域 */
+.answer-box {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* 参考片段区域 */
+.source-box {
+    background-color: #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.source-item {
+    background-color: white;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #28a745;
+    transition: all 0.3s ease;
+}
+
+.source-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.source-item strong {
+    color: #28a745;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* 加载状态样式 */
+.loading {
+    display: none;
+    color: #007bff;
+    font-style: italic;
+    margin-top: 15px;
+    font-size: 0.95rem;
+}
+
+/* 滚动条样式优化 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* 响应式设计优化 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px 0;
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .header-card .card-header {
+        font-size: 1.25rem;
+        padding: 15px;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease;
+}
+
+/* 输入文件按钮样式 */
+input[type="file"] {
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+}

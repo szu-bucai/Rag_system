@@ -1,0 +1,30 @@
+# Hugging Face 模型下载
+huggingface_hub>=0.20.0
+
+# 环境变量管理
+python-dotenv>=1.0.0
+
+# LangChain 核心库
+langchain-core>=0.1.0
+langchain-community>=0.0.20
+langchain-text-splitters>=0.0.1
+langchain-ollama>=0.1.0
+langchain-openai>=0.1.0
+
+# 向量数据库
+chromadb>=0.4.0
+
+# 文档处理
+pypdf>=3.0.0
+docx2txt>=0.8
+pdf2image>=1.16.0
+
+# Web 框架
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# PDF 转图片依赖（Windows 需要）
+# 注意：pdf2image 需要 poppler，Windows 用户需要单独安装
+# 下载地址：https://github.com/oschwartz10612/poppler-windows/releases/
+# 或者使用 conda: conda install -c conda-forge poppler
+

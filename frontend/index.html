@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档智能问答系统</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="./static/index.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="card header-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h1 class="mb-0">文档智能问答系统</h1>
+            <div class="auth-buttons">
+                <button type="button" class="btn btn-light btn-sm me-2" data-bs-toggle="modal" data-bs-target="#loginModal">登录</button>
+                <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">注册</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- 文档上传区域 -->
+        <div class="card">
+            <div class="card-body upload-section">
+                <h4>上传文档</h4>
+                <p>支持PDF和DOCX格式的文档</p>
+                <div class="mb-3">
+                    <input type="file" class="form-control" id="fileInput" accept=".pdf,.docx">
+                </div>
+                <button class="btn btn-primary" id="uploadBtn">上传文档</button>
+                <div id="uploadStatus" class="mt-2"></div>
+            </div>
+        </div>
+
+        <!-- 问答区域 -->
+        <div class="card">
+            <div class="card-body qa-section">
+                <h4>提问</h4>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="questionInput" placeholder="请输入您的问题...">
+                </div>
+                <button class="btn btn-primary" id="qaBtn">提交问题</button>
+                <div class="loading" id="qaLoading">正在生成回答...</div>
+            </div>
+        </div>
+
+        <!-- 结果显示区域 -->
+        <div class="card">
+            <div class="card-body result-section">
+                <h4>回答</h4>
+                <div id="answerDisplay"></div>
+                <h4 class="mt-4">参考片段</h4>
+                <div id="sourceDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">用户登录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginUsername" class="form-label">用户名或邮箱</label>
+                            <input type="text" class="form-control" id="loginUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">密码</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">记住我</label>
+                        </div>
+                        <div id="loginMessage" class="mb-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="loginSubmitBtn">登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">用户注册</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="registerUsername" class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="registerUsername" required minlength="3" maxlength="20">
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerEmail" class="form-label">邮箱</label>
+                            <input type="email" class="form-control" id="registerEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">密码</label>
+                            <input type="password" class="form-control" id="registerPassword" required minlength="6">
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerConfirmPassword" class="form-label">确认密码</label>
+                            <input type="password" class="form-control" id="registerConfirmPassword" required>
+                        </div>
+                        <div id="registerMessage" class="mb-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="registerSubmitBtn">注册</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./static/index.js"></script>
+</body>
+</html>
