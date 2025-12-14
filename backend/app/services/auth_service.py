@@ -19,7 +19,8 @@ def verify_password(plain_password, hashed_password):
 
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    # bcrypt只能处理最多72字节的密码，自动截断
+    return pwd_context.hash(password[:72])
 
 # JWT令牌生成和验证
 

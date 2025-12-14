@@ -1,14 +1,12 @@
 import os
 import dotenv
-import base64
-import json
-import re
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain_chroma import Chroma
-from pdf2image import convert_from_path
-from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
+from rank_bm25 import BM25Okapi
+import jieba
+
 dotenv.load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["OPENAI_BASE_URL"] = os.getenv("OPENAI_BASE_URL")
@@ -16,29 +14,12 @@ os.environ["OPENAI_BASE_URL"] = os.getenv("OPENAI_BASE_URL")
 # 使用官方 API 进行向量化
 embeddings_model = OpenAIEmbeddings(
     model="text-embedding-3-small",
-
 )
 
-def get_chat_llm_instance():
-    """
-    返回配置好的 Qwen3-Plus 阿里云 DashScope ChatOpenAI 对象。
-    """
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",  
-        temperature=0.3,
-    )
-    return llm
-
-class DocumentQAService:
-    def __init__(self, embedding_model=None, llm=None, vectorstore_path="./chroma_db"):
-        self.embedding_model = embedding_model or "text-embedding-3-small"
-        # 使用官方 API 的 embeddings 模型
-        if embedding_model is not None and not isinstance(embedding_model, str):
-            self.embeddings = embedding_model
-        else:
-            self.embeddings = embeddings_model
+class DocumentService:
+    def __init__(self, embedding_model=None, vectorstore_path="./chroma_db"):
+        self.embedding_model = embedding_model or embeddings_model
         self.vectorstore_path = vectorstore_path
-        self.llm = llm
 
     def load_and_split(self, file_path: str, chunk_size=500, chunk_overlap=50, window_size=3):
         """
@@ -127,13 +108,13 @@ class DocumentQAService:
             if db_exists:
                 vectorstore = Chroma(
                     persist_directory=self.vectorstore_path,
-                    embedding_function=self.embeddings
+                    embedding_function=self.embedding_model
                 )
                 vectorstore.add_documents(docs)
             else:
                 vectorstore = Chroma.from_documents(
                     documents=docs,
-                    embedding=self.embeddings,
+                    embedding=self.embedding_model,
                     persist_directory=self.vectorstore_path
                 )
         except Exception as e:
@@ -141,67 +122,44 @@ class DocumentQAService:
         
         return len(docs)
 
-
-
     def get_vectorstore(self):
-        return Chroma(persist_directory=self.vectorstore_path, embedding_function=self.embeddings)
+        return Chroma(persist_directory=self.vectorstore_path, embedding_function=self.embedding_model)
 
     def retrieve(self, query: str, k=5):
         vectorstore = self.get_vectorstore()
         retriever = vectorstore.as_retriever(search_kwargs={"k": k})
         return retriever.invoke(query)
 
-    def keyword_search(self, query: str):
-      """ 
-      遍历所有chunk，返回内容包含query关键词的小块（不区分大小写，若需更精细可正则匹配）。
-      """
-      vectorstore = self.get_vectorstore()
-      # 获取全部document对象（适配Chroma，若用其他库这里需要变通，重点是获取所有chunk）
-      result = vectorstore.get()
-      # 获取所有文档内容和元数据
-      documents = result["documents"]
-      metadatas = result["metadatas"]
-      
-      results = []
-      for page_content, metadata in zip(documents, metadatas):
-          # 确保page_content是字符串类型
-          page_content = str(page_content)
-          if query.lower() in page_content.lower():
-              # 还原为langchain文档对象
-              from langchain_core.documents import Document
-              results.append(Document(page_content=page_content, metadata=metadata))
-      return results
-
-    def answer(self, query: str, prompt_template=None, k=5):
-        # 向量检索
-        vec_docs = self.retrieve(query, k)
-        # 关键词检索
-        kw_docs = self.keyword_search(query)
-
-        # 合并，取所有的父窗口内容（去重，无内容也降级为本chunk）
-        parent_chunks = list({
-            doc.metadata.get("parent_content", doc.page_content)
-            for doc in (vec_docs + kw_docs)
-        })
+    def keyword_search(self, query: str, top_k=5):
+        """ 
+        使用BM25算法检索包含关键词的文档块，支持中英文。
+        """
+        vectorstore = self.get_vectorstore()
+        result = vectorstore.get()
+        documents = result["documents"]
+        metadatas = result["metadatas"]
         
-        if prompt_template is None:
-            prompt_template = """
-            请你严格按照检索到的知识片段内容进行回答，不要编造知识，不要添加任何知识片段中未出现的内容。
-            如果知识片段无法直接回答，请直接回复“未检索到相关答案”。
-
-            知识片段：
-            {text}
-
-            用户问题：
-            {question}
-            """
-        retrieved_text = "\n".join(parent_chunks)
-        prompt = prompt_template.format(text=retrieved_text, question=query)
-        if not self.llm:
-            raise Exception("LLM未初始化")
-        answer = self.llm.invoke(prompt)
-        # 从AIMessage对象中提取文本内容
-        answer_content = answer.content if hasattr(answer, 'content') else str(answer)
-        return {"answer": answer_content, "source": parent_chunks}
-
-
+        # 确保所有文档内容都是字符串类型
+        documents = [str(doc) for doc in documents]
+        
+        # 文本预处理：中文分词
+        def tokenize(text):
+            return list(jieba.cut(text.lower()))
+        
+        # 构建BM25索引
+        tokenized_docs = [tokenize(doc) for doc in documents]
+        bm25 = BM25Okapi(tokenized_docs)
+        
+        # 检索与排序
+        tokenized_query = tokenize(query)
+        scores = bm25.get_scores(tokenized_query)
+        
+        # 获取top_k结果的索引
+        top_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:top_k]
+        
+        results = []
+        for idx in top_indices:
+            if scores[idx] > 0:  # 过滤无匹配结果
+                from langchain_core.documents import Document
+                results.append(Document(page_content=documents[idx], metadata=metadatas[idx]))
+        return results

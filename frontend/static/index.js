@@ -168,7 +168,9 @@ loginSubmitBtn.addEventListener('click', () => {
                 localStorage.setItem('token', data.data.access_token);
             }
         } else {
-            loginMessage.innerHTML = `<div class="alert alert-danger">${data.msg}</div>`;
+            // 安全处理错误消息，确保不会显示undefined
+            const errorMsg = data.msg || '未知错误';
+            loginMessage.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
         }
     })
     .catch(error => {
@@ -220,7 +222,28 @@ registerSubmitBtn.addEventListener('click', () => {
             confirm_password: confirmPassword
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errData => {
+                if (response.status === 422) {
+                    // 解析422错误的详细信息
+                    let errorMessage = '验证错误: ';
+                    if (errData.detail && Array.isArray(errData.detail)) {
+                        errorMessage += errData.detail.map(item => `${item.loc[1]}: ${item.msg}`).join('; ');
+                    } else {
+                        errorMessage += JSON.stringify(errData.detail || '参数验证失败');
+                    }
+                    throw new Error(errorMessage);
+                } else {
+                    throw new Error(`HTTP错误: ${response.status} - ${errData.msg || '请求失败'}`);
+                }
+            }).catch(() => {
+                // 如果无法解析JSON响应，抛出通用错误
+                throw new Error(`HTTP错误: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.code === 0) {
             registerMessage.innerHTML = '<div class="alert alert-success">注册成功！</div>';
@@ -232,11 +255,13 @@ registerSubmitBtn.addEventListener('click', () => {
             // 重置表单
             document.getElementById('registerForm').reset();
         } else {
-            registerMessage.innerHTML = `<div class="alert alert-danger">${data.msg}</div>`;
+            // 安全处理错误消息，确保不会显示undefined
+            const errorMsg = data.msg || '未知错误';
+            registerMessage.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
         }
     })
     .catch(error => {
-        registerMessage.innerHTML = '<div class="alert alert-danger">注册失败，请稍后重试</div>';
+        registerMessage.innerHTML = `<div class="alert alert-danger">注册失败: ${error.message}</div>`;
         console.error('注册请求错误:', error);
     });
 });
